@@ -4,7 +4,9 @@
 >
 > Un juego de mecanografía: asteroides con palabras caen hacia tu nave y los destruyes escribiéndolas. Niveles, PPM, precisión y récord guardado, con palabras en español e inglés.
 
-![asteroid-typer preview](docs/preview.png)
+**[Live demo · Demo en vivo →](https://diegocedenno.github.io/asteroid-typer/)**
+
+[![asteroid-typer preview](docs/preview.png)](https://diegocedenno.github.io/asteroid-typer/)
 
 **[English](#english)** · **[Español](#español)**
 
