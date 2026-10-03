@@ -22,6 +22,7 @@
 - Every 8 words the level goes up: faster falls, more asteroids, longer words. Consecutive words without a mistake build a combo.
 - The HUD tracks score, level, words, WPM (`correct characters / 5 / minutes played`), accuracy and your record, which is kept in `localStorage`.
 - Word language: Spanish, English or mixed (600+ words, grouped by length). A calm mode slows everything down.
+- A switch in the header flips between dark and light mode: the same sky redrawn as a star chart on paper, even mid-game and without pausing. The choice is remembered and shared across the Plutón series.
 
 ### What makes it technically interesting
 
@@ -68,6 +69,7 @@ It also works as-is on GitHub Pages.
 - Cada 8 palabras sube el nivel: caída más rápida, más asteroides y palabras más largas. Las palabras seguidas sin fallo acumulan combo.
 - El marcador lleva puntos, nivel, palabras, PPM (`caracteres correctos / 5 / minutos jugados`), precisión y tu récord, que se guarda en `localStorage`.
 - Idioma de las palabras: español, inglés o mixto (más de 600 palabras, agrupadas por longitud). El modo calma lo ralentiza todo.
+- Un interruptor en la cabecera alterna entre modo oscuro y claro: el mismo cielo redibujado como carta estelar sobre papel, también en plena partida y sin pausarla. La elección se recuerda y se comparte entre los proyectos de la serie Plutón.
 
 ### Qué lo hace interesante técnicamente
 
