@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>asteroid-typer — mecanografía contra asteroides</title>
+  <meta name="description" content="Juego de mecanografía: los asteroides caen hacia tu nave y los destruyes escribiendo su palabra. Niveles, PPM, precisión y récord.">
+  <meta name="theme-color" content="#0d1117">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/tokens.css">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="assets/starfield.js"></script>
+  <script defer src="js/words.js"></script>
+  <script defer src="js/game.js"></script>
+  <script defer src="js/scene.js"></script>
+  <script defer src="js/main.js"></script>
+</head>
+<body>
+  <div class="page">
+    <header class="page-head">
+      <a class="brand" href="./" aria-label="asteroid-typer, inicio">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M28 3.5 L20 10.5" fill="none" stroke="#ff7a3d" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="0.1 3.2"/>
+          <path d="M14.5 5 L6.5 9.5 L11.5 13.5 Z" fill="#768390"/>
+          <path d="M14.5 5 L21.5 9 L11.5 13.5 Z" fill="#c9a27e"/>
+          <path d="M6.5 9.5 L5.5 16 L11.5 13.5 Z" fill="#484f58"/>
+          <path d="M21.5 9 L21 16.5 L11.5 13.5 Z" fill="#8a6548"/>
+          <path d="M5.5 16 L12.5 20.5 L11.5 13.5 Z" fill="#30363d"/>
+          <path d="M21 16.5 L12.5 20.5 L11.5 13.5 Z" fill="#5a4535"/>
+          <rect x="6" y="26" width="13" height="2.4" rx="1.2" fill="#e6edf3"/>
+          <rect x="21.5" y="26" width="4" height="2.4" rx="1.2" fill="#c9a27e"/>
+        </svg>
+        asteroid-typer
+      </a>
+      <p class="console" id="status" role="status">status: <b>listo para despegar</b></p>
+    </header>
+
+    <main class="layout">
+      <h1 class="sr-only">asteroid-typer: juego de mecanografía con asteroides</h1>
+
+      <section class="stage" id="stage" data-state="menu" aria-label="Juego">
+        <dl class="hud" aria-label="Marcador">
+          <div class="hud-item"><dt>puntos</dt><dd id="hud-score">0</dd></div>
+          <div class="hud-item"><dt>nivel</dt><dd id="hud-level">1</dd></div>
+          <div class="hud-item hud-item--words"><dt>palabras</dt><dd id="hud-words">0</dd></div>
+          <div class="hud-item"><dt><abbr title="palabras por minuto">ppm</abbr></dt><dd id="hud-wpm">0</dd></div>
+          <div class="hud-item"><dt>precisión</dt><dd id="hud-accuracy">100&nbsp;%</dd></div>
+          <div class="hud-item hud-item--best"><dt>récord</dt><dd id="hud-best">—</dd></div>
+          <div class="hud-item hud-item--lives">
+            <dt>vidas</dt>
+            <dd id="hud-lives"><i></i><i></i><i></i><span class="sr-only" id="hud-lives-text">3 de 3</span></dd>
+          </div>
+        </dl>
+
+        <div class="field" id="field">
+          <svg class="scene" id="scene" role="img" aria-label="Asteroides con palabras cayendo hacia la nave" focusable="false">
+            <defs>
+              <linearGradient id="tail-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#e6edf3" stop-opacity="0"/>
+                <stop offset="1" stop-color="#e6edf3" stop-opacity="0.14"/>
+              </linearGradient>
+            </defs>
+
+            <g id="rings" aria-hidden="true">
+              <circle class="orbit-dashed"/>
+              <circle class="orbit-dashed"/>
+              <circle class="orbit-dashed"/>
+            </g>
+            <g id="aim" class="aim"><line x1="0" y1="0" x2="1" y2="0" vector-effect="non-scaling-stroke"/></g>
+            <g id="asteroids"></g>
+
+            <g id="ship" class="ship" data-lives="3">
+              <path id="shield" class="shield" d="M-52.16 -13.98 A54 54 0 0 1 52.16 -13.98"/>
+              <g id="ship-rotor">
+                <g transform="translate(-16.8 -28) scale(0.7)">
+                  <path class="flame" d="M17 66 C17 78 21 86 24 94 C27 86 31 78 31 66 Z" fill="#ff7a3d"/>
+                  <path class="flame flame--inner" d="M20.5 66 C20.5 73 22.5 78 24 83 C25.5 78 27.5 73 27.5 66 Z" fill="#ffd9a8"/>
+                  <path d="M14 46 L5 64 L5 69 L15 63 Z" fill="#c9a27e"/>
+                  <path d="M34 46 L43 64 L43 69 L33 63 Z" fill="#c9a27e"/>
+                  <path d="M18 62 H30 L28.5 68 H19.5 Z" fill="#8b949e"/>
+                  <path d="M24 3 C33 13 36 27 36 42 V60 C36 62 34.5 63 33 63 H15 C13.5 63 12 62 12 60 V42 C12 27 15 13 24 3 Z" fill="#f4f6f8"/>
+                  <path d="M24 3 C33 13 36 27 36 42 V60 C36 62 34.5 63 33 63 H27 V42 C27 26 26 13 24 3 Z" fill="#cfd6dd"/>
+                  <path d="M12 50 H36 V54 H12 Z" fill="#c9a27e"/>
+                  <circle cx="24" cy="31" r="6" fill="#161b22" stroke="#8b949e" stroke-width="1.5"/>
+                  <path d="M20.5 29.5 A4 4 0 0 1 24.5 27" fill="none" stroke="#58a6ff" stroke-width="1.5" stroke-linecap="round"/>
+                </g>
+              </g>
+            </g>
+
+            <g id="fx"></g>
+          </svg>
+
+          <p class="level-up" id="level-up" aria-hidden="true">
+            <span class="console">nivel</span>
+            <strong class="mono" id="level-up-num">02</strong>
+          </p>
+
+          <div class="screen" id="screen-start">
+            <div class="screen-body screen-body--start">
+              <div class="intro">
+                <p class="console">misión: proteger la nave</p>
+                <h2 class="title">asteroid-typer</h2>
+                <p class="lede">Los asteroides caen hacia tu nave. Escribe su palabra para destruirlos antes de que lleguen.</p>
+              </div>
+
+              <div class="options">
+                <fieldset class="seg">
+                  <legend class="sr-only">Idioma de las palabras</legend>
+                  <label><input type="radio" name="lang" value="es" checked><span>español</span></label>
+                  <label><input type="radio" name="lang" value="en"><span lang="en">english</span></label>
+                  <label><input type="radio" name="lang" value="mix"><span>mixto</span></label>
+                </fieldset>
+
+                <label class="switch">
+                  <input type="checkbox" id="calm">
+                  <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+                  <span class="switch-text">modo calma <small>· caída más lenta</small></span>
+                </label>
+              </div>
+
+              <ul class="howto">
+                <li>la primera letra fija el asteroide más cercano</li>
+                <li><kbd>Retroceso</kbd> lo suelta · <kbd>Esc</kbd> pausa</li>
+                <li>las tildes son opcionales; la <b>ñ</b>, no</li>
+              </ul>
+
+              <div class="cta">
+                <button type="button" class="btn btn--accent btn--go" id="start">despegar <kbd>Enter</kbd></button>
+                <p class="console" id="best-line">récord: <b>sin partidas todavía</b></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="screen" id="screen-pause" hidden>
+            <div class="screen-body">
+              <p class="console">motores en espera</p>
+              <h2 class="title">En pausa</h2>
+              <p class="lede">Los asteroides esperan. Pulsa <kbd>Enter</kbd> o <kbd>Esc</kbd> para continuar.</p>
+              <div class="actions">
+                <button type="button" class="btn btn--accent btn--go" id="resume">reanudar</button>
+                <button type="button" class="btn" id="quit">terminar partida</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="screen" id="screen-over" hidden>
+            <div class="screen-body">
+              <p class="console">fin de partida</p>
+              <h2 class="title">Nave alcanzada</h2>
+              <p class="badge" id="record-badge" hidden>nuevo récord</p>
+              <dl class="summary">
+                <div><dt>puntos</dt><dd id="sum-score">0</dd></div>
+                <div><dt>nivel</dt><dd id="sum-level">1</dd></div>
+                <div><dt>palabras</dt><dd id="sum-words">0</dd></div>
+                <div><dt>ppm</dt><dd id="sum-wpm">0</dd></div>
+                <div><dt>precisión</dt><dd id="sum-accuracy">100&nbsp;%</dd></div>
+                <div><dt>mejor combo</dt><dd id="sum-combo">0</dd></div>
+              </dl>
+              <div class="actions">
+                <button type="button" class="btn btn--accent btn--go" id="again">jugar de nuevo <kbd>Enter</kbd></button>
+                <button type="button" class="btn" id="menu">menú</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="entry">
+          <label class="entry-box" id="entry-box" for="entry">
+            <span class="sr-only">Escribe aquí la palabra del asteroide</span>
+            <span class="entry-prompt" aria-hidden="true">&gt;</span>
+            <span class="entry-typed" id="typed" aria-hidden="true"></span><span class="entry-caret" aria-hidden="true"></span><span class="entry-ghost" id="ghost" aria-hidden="true"></span>
+            <span class="entry-hint" id="entry-hint" aria-hidden="true">escribe la primera letra de un asteroide</span>
+            <span class="entry-combo" id="combo" aria-hidden="true" hidden></span>
+            <input class="entry-input" id="entry" type="text" inputmode="text" enterkeyhint="go" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" disabled>
+          </label>
+          <button type="button" class="btn entry-pause" id="pause" aria-label="Pausar la partida" disabled>
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="2.5" width="3.4" height="11" rx="1" fill="currentColor"/><rect x="9.6" y="2.5" width="3.4" height="11" rx="1" fill="currentColor"/></svg>
+            <span>pausa</span>
+          </button>
+        </div>
+
+        <p class="sr-only" id="announce" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <footer class="page-foot">
+      <span>asteroid-typer · serie Plutón</span>
+      <span>hecho por <a href="https://github.com/diegocedenno">diegocedenno</a> · MIT</span>
+    </footer>
+  </div>
+</body>
+</html>

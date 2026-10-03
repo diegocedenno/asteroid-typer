@@ -1,0 +1,889 @@
+/* asteroid-typer — estilos propios. Los tokens y la base viven en assets/tokens.css */
+
+:root {
+  /* Velos sobre el campo de estrellas: el fondo de la página con transparencia. */
+  --veil: rgba(13, 17, 23, 0.5);
+  --veil-strong: rgba(13, 17, 23, 0.94);
+}
+
+.layout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* ---------- escenario ---------- */
+
+.stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: clamp(460px, calc(100dvh - 164px), 760px);
+  background: var(--veil);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* ---------- marcador ---------- */
+
+.hud {
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-2) clamp(var(--s-5), 4vw, var(--s-7));
+  margin: 0;
+  padding: var(--s-3) var(--s-5);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.hud-item--best {
+  margin-left: auto;
+}
+
+.hud dt {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.hud abbr {
+  text-decoration: none;
+}
+
+.hud dd {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+#hud-best.is-beaten {
+  color: var(--accent);
+}
+
+#hud-lives {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 1.3em;
+}
+
+#hud-lives i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  transition: opacity var(--t-med) var(--ease-out);
+}
+
+#hud-lives i.is-lost {
+  background: transparent;
+  border-color: var(--border-strong);
+}
+
+/* ---------- campo de juego ---------- */
+
+/* En el menú y en el resumen el escenario puede crecer con su contenido:
+   en un móvil pequeño se desplaza la página, no se recorta la pantalla. */
+.stage[data-state="menu"],
+.stage[data-state="over"] {
+  height: auto;
+  min-height: clamp(460px, calc(100dvh - 164px), 760px);
+}
+
+.field {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  transition: opacity var(--t-slow) var(--ease-out);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.asteroid {
+  animation: ast-in 420ms var(--ease-out) both;
+}
+
+@keyframes ast-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ast-facet {
+  stroke: var(--bg);
+  stroke-width: 0.6;
+  stroke-linejoin: round;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.ast-tail {
+  fill: url(#tail-grad);
+}
+
+.ast-ring {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.2;
+  stroke-dasharray: 2 5;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity var(--t-med) var(--ease-out);
+}
+
+.ast-pill {
+  fill: var(--bg);
+  fill-opacity: 0.86;
+  stroke: var(--border);
+  stroke-width: 1;
+  transition: stroke var(--t-fast) var(--ease-out);
+}
+
+.ast-flash {
+  fill: var(--alert-soft);
+  stroke: var(--alert);
+  stroke-width: 1.5;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ast-word {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  fill: var(--text);
+}
+
+.ast-done {
+  fill: var(--accent);
+}
+
+.asteroid.is-target .ast-ring {
+  opacity: 0.9;
+}
+
+.asteroid.is-target .ast-pill {
+  stroke: var(--accent);
+  fill-opacity: 1;
+}
+
+.asteroid.is-target .ast-rest {
+  fill: var(--text);
+}
+
+/* Restos de un asteroide destruido: solo quedan las caras volando. */
+.debris .ast-tail,
+.debris .ast-ring,
+.debris .ast-label {
+  display: none;
+}
+
+.aim {
+  opacity: 0;
+  transition: opacity var(--t-fast) var(--ease-out);
+}
+
+.aim.is-on {
+  opacity: 1;
+}
+
+.aim line {
+  stroke: var(--accent);
+  stroke-width: 1.2;
+  stroke-dasharray: 1.5 6;
+  stroke-linecap: round;
+}
+
+.beam {
+  pointer-events: none;
+}
+
+.beam line {
+  stroke: var(--alert);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.beam .beam-core {
+  stroke: var(--pluto-heart);
+  stroke-width: 1;
+}
+
+.wave {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.4;
+  transform-box: fill-box;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.pop {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  fill: var(--accent);
+  stroke: var(--bg);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+  transform-box: fill-box;
+  pointer-events: none;
+}
+
+/* ---------- nave ---------- */
+
+.shield {
+  fill: none;
+  stroke: var(--cold);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 6;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.ship[data-lives="2"] .shield {
+  opacity: 0.5;
+}
+
+/* Última vida: el escudo late en naranja. */
+.ship[data-lives="1"] .shield {
+  stroke: var(--alert);
+  animation: shield-low 620ms var(--ease-in-out) infinite alternate;
+}
+
+.ship[data-lives="0"] .shield {
+  opacity: 0;
+}
+
+.shield.is-hit {
+  stroke: var(--alert);
+}
+
+@keyframes shield-low {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+
+.flame {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: flame 460ms var(--ease-in-out) infinite alternate;
+}
+
+.flame--inner {
+  animation-duration: 330ms;
+}
+
+@keyframes flame {
+  from {
+    transform: scaleY(0.72);
+    opacity: 0.8;
+  }
+  to {
+    transform: scaleY(1.06);
+    opacity: 1;
+  }
+}
+
+/* ---------- aviso de nivel ---------- */
+
+.level-up {
+  position: absolute;
+  top: 26%;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-1);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.level-up strong {
+  font-size: var(--fs-display);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+/* ---------- pantallas ---------- */
+
+.screen {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: var(--s-5) var(--s-4);
+  background: var(--veil-strong);
+  overflow-y: auto;
+  animation: screen-in 360ms var(--ease-out) both;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.stage[data-state="menu"] .screen,
+.stage[data-state="over"] .screen {
+  position: relative;
+  flex: 1;
+}
+
+/* Menú: sin velo, con la nave esperando en su sitio bajo el contenido. */
+.stage[data-state="menu"] .screen {
+  align-items: start;
+  padding-top: var(--s-5);
+  padding-bottom: 104px;
+  background: none;
+}
+
+.screen-body.screen-body--start {
+  gap: 1.125rem;
+  max-width: 580px;
+}
+
+.intro,
+.cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.cta {
+  gap: var(--s-3);
+}
+
+.screen-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-4);
+  width: 100%;
+  max-width: 460px;
+  text-align: center;
+}
+
+.title {
+  font-size: var(--fs-xl);
+}
+
+.lede {
+  max-width: 38ch;
+  color: var(--text-2);
+  text-wrap: balance;
+}
+
+kbd {
+  display: inline-block;
+  text-indent: 0;
+  padding: 0 0.4em;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-1) var(--s-5);
+}
+
+.seg {
+  display: inline-flex;
+  min-width: 0;
+  margin: 0;
+  padding: 3px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.seg label {
+  position: relative;
+  display: block;
+}
+
+.seg input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.seg span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--s-4);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  transition:
+    background-color var(--t-fast) var(--ease-out),
+    color var(--t-fast) var(--ease-out);
+}
+
+.seg label:hover span {
+  color: var(--text);
+}
+
+.seg input:checked + span {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.seg input:focus-visible + span {
+  outline: 2px solid var(--cold);
+  outline-offset: 2px;
+}
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 44px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+
+.switch input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.switch-track {
+  flex: none;
+  width: 36px;
+  height: 20px;
+  padding: 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  transition:
+    background-color var(--t-fast) var(--ease-out),
+    border-color var(--t-fast) var(--ease-out);
+}
+
+.switch-thumb {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text-2);
+  transition:
+    transform var(--t-med) var(--ease-spring),
+    background-color var(--t-fast) var(--ease-out);
+}
+
+.switch input:checked ~ .switch-track {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.switch input:checked ~ .switch-track .switch-thumb {
+  transform: translateX(16px);
+  background: var(--accent);
+}
+
+.switch input:focus-visible ~ .switch-track {
+  outline: 2px solid var(--cold);
+  outline-offset: 2px;
+}
+
+.switch small {
+  font-size: inherit;
+  color: var(--text-2);
+}
+
+.howto {
+  display: grid;
+  gap: var(--s-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+}
+
+.howto li {
+  padding-left: 2ch;
+  text-indent: -2ch;
+}
+
+.howto li::before {
+  content: "> ";
+  color: var(--accent);
+}
+
+.howto b {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s-3);
+}
+
+.btn--go {
+  min-width: 190px;
+  font-size: var(--fs-md);
+}
+
+.btn--go kbd {
+  border-color: currentColor;
+  color: inherit;
+  opacity: 0.75;
+}
+
+.badge {
+  padding: 2px var(--s-3);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  width: 100%;
+  margin: 0;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-family: var(--font-mono);
+}
+
+.summary div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--s-3) var(--s-2);
+  background: var(--surface);
+}
+
+.summary dt {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
+}
+
+.summary dd {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- caja de texto ---------- */
+
+.entry {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-5);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.entry-box {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 var(--s-4);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: text;
+  transition: border-color var(--t-fast) var(--ease-out);
+}
+
+.entry-box:focus-within {
+  border-color: var(--cold);
+}
+
+/* El <input> real cubre la caja pero no se ve: lo tecleado se pinta al lado,
+   letra a letra, con la parte pendiente de la palabra en gris. */
+.entry-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  font-size: 16px; /* evita el zoom automático de iOS al enfocar */
+}
+
+.entry-prompt {
+  margin-right: 1ch;
+  color: var(--accent);
+}
+
+.entry-typed {
+  color: var(--accent);
+}
+
+.entry-ghost {
+  color: var(--text-2);
+}
+
+.entry-caret {
+  flex: none;
+  width: 2px;
+  height: 1.15em;
+  margin-inline: 1px;
+  background: var(--accent);
+  opacity: 0;
+}
+
+/* El estado base es el cursor visible: con movimiento reducido la animación
+   no corre y el cursor se queda fijo, no desaparece. */
+.stage[data-state="playing"] .entry-caret {
+  opacity: 1;
+  animation: caret 560ms var(--ease-in-out) infinite alternate;
+}
+
+@keyframes caret {
+  from {
+    opacity: 0.15;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.entry-hint {
+  margin-left: var(--s-2);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.entry-box.has-target .entry-hint {
+  display: none;
+}
+
+.entry-combo {
+  margin-left: auto;
+  padding-left: var(--s-3);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.entry-pause {
+  flex: none;
+}
+
+.btn:disabled {
+  color: var(--text-2);
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ---------- pantallas estrechas ---------- */
+
+@media (max-width: 860px) {
+  .page {
+    gap: var(--s-4);
+  }
+
+  .layout {
+    justify-content: flex-start;
+  }
+
+  .stage {
+    height: clamp(440px, calc(100dvh - 186px), 760px);
+  }
+
+  .stage[data-state="menu"],
+  .stage[data-state="over"] {
+    min-height: clamp(440px, calc(100dvh - 186px), 760px);
+  }
+
+  /* En móvil el menú necesita todo el alto: sin nave ni caja de texto debajo. */
+  .stage[data-state="menu"] .scene {
+    opacity: 0;
+  }
+
+  .stage[data-state="menu"] .entry {
+    display: none;
+  }
+
+  .stage[data-state="menu"] .screen {
+    align-items: center;
+    padding-block: var(--s-5);
+  }
+
+  .hud {
+    gap: var(--s-2) var(--s-5);
+    padding: var(--s-3) var(--s-4);
+  }
+
+  .entry {
+    gap: var(--s-2);
+    padding: var(--s-2) var(--s-3);
+  }
+
+  .entry-box {
+    padding: 0 var(--s-3);
+  }
+
+  .entry-pause {
+    width: 44px;
+    padding: 0;
+  }
+
+  .entry-pause span {
+    display: none;
+  }
+}
+
+/* Móvil: el marcador pasa a una rejilla de dos filas. */
+@media (max-width: 620px) {
+  .hud {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--s-2) var(--s-3);
+  }
+
+  .hud-item--best {
+    margin-left: 0;
+  }
+
+  .hud dd {
+    font-size: var(--fs-md);
+  }
+}
+
+@media (max-width: 860px) and (max-height: 700px) {
+  .intro .console {
+    display: none;
+  }
+
+  .screen-body.screen-body--start {
+    gap: var(--s-3);
+  }
+}
+
+/* Teclado en pantalla abierto (lo detecta main.js): el juego ocupa el
+   viewport visible entero y el marcador se queda en una fila. */
+body.is-compact .page-head,
+body.is-compact .page-foot {
+  display: none;
+}
+
+body.is-compact .page {
+  gap: 0;
+  min-height: 0;
+  padding-block: var(--s-2);
+}
+
+body.is-compact .stage {
+  height: calc(var(--vvh, 100dvh) - 1rem);
+  min-height: 300px;
+}
+
+body.is-compact .hud {
+  grid-template-columns: repeat(5, auto);
+  justify-content: space-between;
+  padding-block: var(--s-2);
+}
+
+body.is-compact .hud-item--words,
+body.is-compact .hud-item--best {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ast-tail {
+    display: none;
+  }
+}
