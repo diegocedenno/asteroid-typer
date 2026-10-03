@@ -455,6 +455,15 @@
     if (state === "playing" && !event.target.closest("button, input, label")) event.preventDefault();
   });
 
+  // El interruptor de tema tampoco: cambiar de tema a media partida no la pausa
+  // y se puede seguir tecleando sin soltar nada.
+  var themeToggle = document.querySelector("[data-theme-toggle]");
+  if (themeToggle) {
+    themeToggle.addEventListener("mousedown", function (event) {
+      if (state === "playing") event.preventDefault();
+    });
+  }
+
   /* ---------- controles ---------- */
 
   // Clic de ratón o dedo (detail > 0): se suelta el foco del botón para que

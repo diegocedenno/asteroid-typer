@@ -4,6 +4,36 @@
   /* Velos sobre el campo de estrellas: el fondo de la página con transparencia. */
   --veil: rgba(13, 17, 23, 0.5);
   --veil-strong: rgba(13, 17, 23, 0.94);
+  /* Lo incandescente (núcleo de la llama y del láser) y la sombra propia de la nave. */
+  --hot: #ffd9a8;
+  --beam-core: var(--pluto-heart);
+  --ship-shade: #cfd6dd;
+}
+
+:root[data-theme="light"] {
+  --veil: rgba(244, 241, 236, 0.5);
+  --veil-strong: rgba(244, 241, 236, 0.94);
+  --beam-core: var(--hot);
+}
+
+/* ---------- marca ---------- */
+
+.brand-trail {
+  stroke: var(--alert);
+}
+
+.brand-line {
+  fill: var(--text);
+}
+
+.brand-caret {
+  fill: var(--accent);
+}
+
+/* El interruptor mide 2 px más que la marca. El alto del escenario se calcula
+   restando una cabecera de 26 px, así que no debe hacer crecer la fila. */
+.page-head > .theme-toggle {
+  margin-block: -1px;
 }
 
 .layout {
@@ -153,6 +183,11 @@
   fill: url(#tail-grad);
 }
 
+/* Estela: luz sobre el cielo oscuro, tinta sobre papel. */
+.tail-stop {
+  stop-color: var(--text);
+}
+
 .ast-ring {
   fill: none;
   stroke: var(--accent);
@@ -188,6 +223,12 @@
 
 .ast-done {
   fill: var(--accent);
+}
+
+/* Sobre papel acento y tinta son dos oscuros parecidos: las letras acertadas
+   ganan peso para distinguirse de las pendientes (en mono no cambia el ancho). */
+:root[data-theme="light"] .ast-done {
+  font-weight: 700;
 }
 
 .asteroid.is-target .ast-ring {
@@ -237,7 +278,7 @@
 }
 
 .beam .beam-core {
-  stroke: var(--pluto-heart);
+  stroke: var(--beam-core);
   stroke-width: 1;
 }
 
@@ -264,6 +305,41 @@
 }
 
 /* ---------- nave ---------- */
+
+/* Cohete blanco: en modo claro lo sostiene un contorno de tinta, dibujado encima
+   de la sombra y la banda para que no se lo coman. */
+.ship-body {
+  fill: var(--rocket);
+}
+
+.ship-shade {
+  fill: var(--ship-shade);
+}
+
+.ship-outline {
+  fill: none;
+  stroke: var(--rocket-line);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+
+.ship-fin,
+.ship-band {
+  fill: var(--accent);
+}
+
+.ship-nozzle {
+  fill: var(--text-2);
+}
+
+.ship-window {
+  fill: var(--surface);
+  stroke: var(--text-2);
+}
+
+.ship-glint {
+  stroke: var(--cold);
+}
 
 .shield {
   fill: none;
@@ -302,12 +378,14 @@
 }
 
 .flame {
+  fill: var(--alert);
   transform-box: fill-box;
   transform-origin: 50% 0%;
   animation: flame 460ms var(--ease-in-out) infinite alternate;
 }
 
 .flame--inner {
+  fill: var(--hot);
   animation-duration: 330ms;
 }
 
