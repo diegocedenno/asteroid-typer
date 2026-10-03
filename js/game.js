@@ -157,17 +157,21 @@
       over: false,
     };
 
-    // Columna de salida: la más alejada de los asteroides que acaban de entrar.
+    /* Columna de salida (0–1): de doce candidatas repartidas por el ancho, la
+       más alejada de los asteroides que acaban de entrar, que son los únicos
+       con los que su palabra podría pisarse. */
     function pickColumn() {
       var best = 0.5;
       var bestGap = -1;
-      for (var i = 0; i < 8; i++) {
-        var x = random();
+      var shift = random();
+      for (var i = 0; i < 12; i++) {
+        var x = (i + shift) / 12;
         var gap = 1;
         for (var k = 0; k < game.asteroids.length; k++) {
           var other = game.asteroids[k];
-          if (other.t < 0.45) gap = Math.min(gap, Math.abs(other.x - x));
+          if (other.t < 0.3) gap = Math.min(gap, Math.abs(other.x - x));
         }
+        gap += random() * 0.05; // desempate: que no salgan siempre por los bordes
         if (gap > bestGap) {
           bestGap = gap;
           best = x;
